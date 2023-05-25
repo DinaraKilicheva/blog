@@ -6,6 +6,8 @@ from blog.models import Post, Comment, LikeDislike
 
 admin.site.register(Post)
 admin.site.register(LikeDislike)
+
+
 @admin.register(Comment)
 class CommentsAdmin(admin.ModelAdmin):
     list_display = ["user", "blog"]

@@ -1,13 +1,5 @@
-# from django.shortcuts import render
-# from django.http import Http404
-# from drf_yasg.utils import swagger_auto_schema
-# from rest_framework import generics
-# from django_filters.rest_framework import DjangoFilterBackend
-# from rest_framework.filters import SearchFilter, OrderingFilter
-# from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
-# from rest_framework.response import Response
-# from rest_framework.
 from django.http import Http404
+from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -23,10 +15,10 @@ from blog.serializers.post_serializer import PostSerializer, PostListSerializer,
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.order_by("-id")
-    # filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
-    # filterset_fields = ("category", "brand")
-    # ordering_fields = ("id", "price")
-    # search_fields = ("title", 'category__title', "brand_title")
+    filter_backends = (DjangoFilterBackend, OrderingFilter, SearchFilter)
+    filterset_fields = ("category", "author", "likes")
+    ordering_fields = ("id", "title")
+    search_fields = ("title", 'category__title')
     pagination_class = CustomPageNumberPagination
     
     serializer_class = PostListSerializer
@@ -73,11 +65,11 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ["PUT", "PATCH"]:
             return PostCreateSerializer
         return PostListSerializer
-    
-    
+
+
 class BlogLikeDislikeView(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     @swagger_auto_schema(request_body=BlogLikeDislikeSerializer)
     def post(self, request, *args, **kwargs):
         serializer = BlogLikeDislikeSerializer(data=request.data)

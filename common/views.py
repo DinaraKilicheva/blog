@@ -11,17 +11,6 @@ from .models import Category
 from common.serializers import CategorySerializer, CategoryDetailSerializer
 
 
-# Create your views here.
-
-# class CategoryListView(generics.ListAPIView):
-#     queryset = Category.objects.all()
-#     serializer_class = CategorySerializer
-#
-#
-# class CategoryCreateView(generics.CreateAPIView):
-#     permission_classes = [IsAdminUser]
-#     queryset = Category.objects.all()
-#     serializer_class = CategorySerializer
 class CategoryListCreateView(APIView):
     permission_classes = [IsAdminUser]
     
