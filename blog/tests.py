@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 # from rest_framework.test import APIClient
 
-from blog.models import Post, LikeDislike
+from blog.models import Post, LikeDislike, Comment
 from common.models import Category
 from users.models import User
 
@@ -21,7 +21,6 @@ class TestPostListView(TestCase):
             is_admin=True,
             is_staff=True,
         )
-        self.client.login(email=self.author.email, password="2332")
         
         self.category = Category.objects.create(title="Technology")
         self.post = Post.objects.create(
@@ -40,10 +39,17 @@ class TestPostListView(TestCase):
             "views": 3
         }
         self.like_dislike = LikeDislike.objects.create(post=self.post, user=self.author, type='1')
-
+        
         self.like_dislike_data = {
-                "type": -1
-            }
+            "type": -1
+        }
+        
+        # self.comment = Comment.objects.create(
+        #     user=self.author.id,
+        #     content="wqw",
+        #     post=self.post.id
+        # )
+        
     
     def test_post_list(self):
         print("sdf")
@@ -67,7 +73,6 @@ class TestPostListView(TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_post_update(self):
-        
         url = reverse("post_detail", kwargs={'id': self.post.pk})
         data = {
             "title": "update_post",
@@ -80,88 +85,30 @@ class TestPostListView(TestCase):
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["title"], data["title"])
-
+    
     def test_post_delete(self):
         self.client.login(email=self.author.email, password="2332")
         url = reverse("post_detail", kwargs={'id': self.post.pk})
-    
+        
         response = self.client.delete(url)
-    
+        
         self.assertEqual(response.status_code, 204)
-
+    
     def test_post_like(self):
         url = reverse('post_likes', kwargs={'id': self.post.pk})
         response = self.client.post(url, data=self.like_dislike_data)
         self.assertEqual(response.status_code, 201)
-
-# class BlogTest(TestCase):
-#     def setUp(self) -> None:
-#         # self.client = APIClient()
-#         self.category = Category.objects.create(title='test_title')
-#         self.user = User.objects.create_user(
-#             email='tests@gmail.com',
-#             username='tests',
-#             password='123456'
-#         )
-#         self.client.login(user=self.user)
-#         self.post = Post.objects.create(
-#             title='test_title1',
-#             body='body',
-#             author=self.user,
-#             category=self.category
-#         )
-#
-#         self.comment = Comment.objects.create(blog=self.post, user=self.user)
-#
-#         self.post_data = {
-#             "title": 'test_title1',
-#             "body": 'body',
-#             "author": self.user,
-#             "category": self.category
-#         }
-#
-#         self.comment_data = {
-#             "post": self.post,
-#             "content": "string"
-#         }
-#
-#         self.like_dislike = LikeDislike.objects.create(blog=self.post, user=self.user, type='1')
-#         self.like_dislike_data = {
-#             "type": -1
-#         }
-#
-#     def test_post_list(self):
-#         url = reverse('post_list')
-#         response = self.client.get(url)
-#
-#         self.assertEqual(response.status_code, 200)
-#
-#     def test_post_create(self):
-#         url = reverse('post_create')
-#         response = self.client.post(url, data=self.post_data)
-#
-#         self.assertEqual(response.status_code, 201)
-#
-#     def test_post_detail(self):
-#         url = reverse('post_detail', kwargs={'slug': self.post.slug})
-#         response = client.get(url)
-#
-#         self.assertEqual(response.status_code, 200)
-#
-#     def test_post_liked(self):
-#         url = reverse('post_likes', kwargs={'slug': self.post.slug})
-#         response = client.post(url, data=self.like_dislike_data)
-#
-#         self.assertEqual(response.status_code, 201)
-#
-#     def test_comment_get(self):
-#         self.client.login(user=self.user)
-#         url = reverse('comment_list_create', kwargs={'slug': self.post.slug})
-#         response = client.get(url)
-#         self.assertEqual(response.status_code, 200)
-#
-#     def test_comment_create(self):
-#         url = reverse('comment_list_create', kwargs={'slug': self.post.slug})
-#         response = self.client.post(url, data=self.comment_data)
-#
-#         self.assertEqual(response.status_code, 201)
+    
+    # def test_comment_get(self):
+    #     self.client.login(user=self.author)
+    #     url = reverse('comment_list_create', kwargs={'blog_id': self.post.id})
+    #     response = client.get(url)
+    #     self.assertEqual(response.status_code, 200)
+    #
+    # def test_comment_post(self):
+    #     comment_data = {
+    #         "some text"
+    #     }
+    #     url = reverse('comment_detail', kwargs={'blog_id': self.post.id, "id": self.comment.id})
+    #     response = self.client.post(url, comment_data)
+    #     self.assertEqual(response.status_code, 201)

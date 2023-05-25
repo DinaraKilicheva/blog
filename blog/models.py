@@ -2,6 +2,7 @@ import datetime
 
 from django.db import models
 from django.utils.text import slugify
+from django.utils.text import slugify, gettext_lazy as _
 import users
 
 
@@ -14,9 +15,6 @@ class Post(models.Model):
     image = models.ImageField(upload_to='images', null=True, blank=True)
     views = models.BigIntegerField(default=0, blank=True)
     published_at = datetime.datetime.now().strftime("%H:%M / %d.%m.%Y")
-    
-    
-    
     
     @property
     def likes(self):
@@ -44,8 +42,8 @@ class Comment(models.Model):
 
 class LikeDislike(models.Model):
     class LikeDislikeTypes(models.IntegerChoices):
-        LIKE = 1
-        DISLIKE = -1
+        LIKE = 1, _("like")
+        DISLIKE = -1, _("dislike")
     
     post = models.ForeignKey("Post", on_delete=models.CASCADE, related_name="like_dislikes")
     user = models.ForeignKey("users.User", on_delete=models.CASCADE, related_name="like_dislikes")
