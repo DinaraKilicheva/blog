@@ -3,7 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 # from rest_framework.test import APIClient
 
-from blog.models import Post
+from blog.models import Post, LikeDislike
 from common.models import Category
 from users.models import User
 
@@ -17,10 +17,11 @@ class TestPostListView(TestCase):
             username="example",
             first_name="Ben",
             email="user@example.com",
-            password="2332"
+            password="2332",
+            is_admin=True,
+            is_staff=True,
         )
-        self.client.login(user=self.author, password=2332)
-        client.force_login(user=self.author)
+        self.client.login(email=self.author.email, password="2332")
         
         self.category = Category.objects.create(title="Technology")
         self.post = Post.objects.create(
@@ -38,6 +39,11 @@ class TestPostListView(TestCase):
             "category": self.category.id,
             "views": 3
         }
+        self.like_dislike = LikeDislike.objects.create(post=self.post, user=self.author, type='1')
+
+        self.like_dislike_data = {
+                "type": -1
+            }
     
     def test_post_list(self):
         print("sdf")
@@ -45,18 +51,18 @@ class TestPostListView(TestCase):
         response = client.get(url)
         
         self.assertEqual(response.status_code, 200)
-        response = client.post(url, data=self.new_post_data)
+        response = self.client.post(url, data=self.new_post_data)
     
     def test_post_create(self):
         url = reverse("post_create")
-        response = client.post(url, self.new_post_data)
+        response = self.client.post(url, self.new_post_data)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["title"], self.new_post_data["title"])
     
     def test_post_detail(self):
         url = reverse("post_detail", kwargs={'id': self.post.pk})
         
-        response = client.get(url)
+        response = self.client.get(url)
         
         self.assertEqual(response.status_code, 200)
     
@@ -70,17 +76,23 @@ class TestPostListView(TestCase):
             "category": self.category.id,
             "views": 4
         }
-        response = client.put(url, data=data, content_type="application/json")
+        response = self.client.put(url, data=data, content_type="application/json")
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["title"], data["title"])
 
     def test_post_delete(self):
+        self.client.login(email=self.author.email, password="2332")
         url = reverse("post_detail", kwargs={'id': self.post.pk})
     
-        response = client.delete(url)
+        response = self.client.delete(url)
     
         self.assertEqual(response.status_code, 204)
+
+    def test_post_like(self):
+        url = reverse('post_likes', kwargs={'id': self.post.pk})
+        response = self.client.post(url, data=self.like_dislike_data)
+        self.assertEqual(response.status_code, 201)
 
 # class BlogTest(TestCase):
 #     def setUp(self) -> None:

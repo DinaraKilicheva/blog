@@ -74,5 +74,9 @@ class PostCreateSerializer(serializers.ModelSerializer):
         return data
 
 
-class BlogLikeDislikeSerializer(serializers.Serializer):
+class BlogLikeDislikeSerializer(serializers.ModelSerializer):
     type = serializers.ChoiceField(choices=LikeDislike.LikeDislikeTypes.choices)
+    
+    class Meta:
+        model = LikeDislike
+        fields = ["id", "type"]

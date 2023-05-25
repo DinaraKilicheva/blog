@@ -79,17 +79,16 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class CustomRegisterTokenSerializer(TokenObtainSerializer):
     token_class = RefreshToken
 
-
-def validate(self, attrs):
-    data = super().validate(attrs)
-    refresh = self.get_token(self.user)
-    data["refresh"] = str(refresh)
-    data["access"] = str(refresh.access_token)
-    data["user"] = UserSerializer(self.user).data
-    
-    if api_settings.UPDATE_LAST_LOGIN:
-        update_last_login(None, self.user)
-    return data
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        refresh = self.get_token(self.user)
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+        data["user"] = UserSerializer(self.user).data
+        
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, self.user)
+        return data
 
 
 class SendEmailVerificationCodeSerializer(serializers.Serializer):

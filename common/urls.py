@@ -4,5 +4,5 @@ from common.views import CategoryListCreateView, CategoryDetailView
 
 urlpatterns = [
     path("", CategoryListCreateView.as_view(), name='category-list'),
-    path("detail/", CategoryDetailView.as_view(), name='category-detail'),
+    path("detail/<int:pk>/", CategoryDetailView.as_view(), name='category-detail'),
 ]

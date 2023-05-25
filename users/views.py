@@ -58,7 +58,7 @@ class ProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class RegisterTokenView(TokenObtainPairView):
+class LoginTokenView(TokenObtainPairView):
     serializer_class = CustomRegisterTokenSerializer
 
 
